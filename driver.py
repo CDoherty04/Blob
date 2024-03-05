@@ -23,7 +23,7 @@ def main():
     city_map = lines[2:]
 
     my_blob = Blob(max_x, max_y, start_x, start_y, city_map)
-    my_blob.spread()
+    print(my_blob.output())
 
 
 if __name__ == "__main__":
