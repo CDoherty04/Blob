@@ -22,32 +22,53 @@ class Blob:
                 if spot == "@":
                     self.sewers.append((i, j))
 
-    def teleport(self):
-        """Goes from one sewer to another"""
-        print("Teleport")
-
-    def check_tile(self, x, y):
-        tile = self.map[x][y]
+    def check_tile(self, row, col):
+        tile = self.map[row][col]
         if tile == "P":
             self.people_eaten += 1
+            return False
         elif tile == "@":
-            self.teleport()
+            return True
 
-    def spread(self, x, y):
+    def spread(self, r, c):
         """"""
-        self.check_tile(x, y)
-        # Check up, right, down, left
-        if y > 0:
-            "Can go up"
-        elif x < self.max_x:
-            "Can go right"
-        elif y < self.max_y:
-            "Can go down"
-        elif x > 0:
-            "Can go left"
-        elif (x, y) in self.sewers:
-            "Can travel through sewers"
-        self.map[x][y] = "B"
+        # todo: Need a way to mark past travel
+        on_sewer = self.check_tile(r, c)
+
+        # Can go up
+        if r > 0 and self.map[r-1][c] != "#" and self.map[r-1][c] != "B":
+            self.map[r][c] = "B"
+            r -= 1
+            self.spread(r, c)
+
+        # Can go right
+        elif c < self.max_x-1 and self.map[r][c+1] != "#" and self.map[r][c+1] != "B":
+            self.map[r][c] = "B"
+            c += 1
+            self.spread(r, c)
+
+        # Can go down
+        elif r < self.max_y-1 and self.map[r+1][c] != "#" and self.map[r+1][c] != "B":
+            self.map[r][c] = "B"
+            r += 1
+            self.spread(r, c)
+
+        # Can go left
+        elif c > 0 and self.map[r][c-1] != "#" and self.map[r][c-1] != "B":
+            self.map[r][c] = "B"
+            c -= 1
+            self.spread(r, c)
+
+        # Go through sewers
+        elif on_sewer:
+            self.map[r][c] = "B"
+            r, c = self.sewers.pop(0)
+            self.spread(r, c)
+
+        # If the blob can't spread, mark a B and go back
+        else:
+            self.map[r][c] = "B"
+            return
 
     def __str__(self):
         """Returns a well formatted map with the people eaten"""
