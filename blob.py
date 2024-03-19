@@ -22,53 +22,29 @@ class Blob:
                 if spot == "@":
                     self.sewers.append((i, j))
 
-    def check_tile(self, row, col):
-        tile = self.map[row][col]
-        if tile == "P":
-            self.people_eaten += 1
-            return False
-        elif tile == "@":
-            return True
-
-    def spread(self, r, c):
+    def spread(self, r, c, back):
         """"""
-        # todo: Need a way to mark past travel
-        on_sewer = self.check_tile(r, c)
+        # Go up
+        if r > 0 and self.map[r - 1][c] != "#" and back != "up":
+            self.spread(r - 1, c, "down")
 
-        # Can go up
-        if r > 0 and self.map[r-1][c] != "#" and self.map[r-1][c] != "B":
-            self.map[r][c] = "B"
-            r -= 1
-            self.spread(r, c)
+        # Go right
+        if c < self.max_x-1 and self.map[r][c+1] != "#" and back != "right":
+            self.spread(r, c + 1, "left")
 
-        # Can go right
-        elif c < self.max_x-1 and self.map[r][c+1] != "#" and self.map[r][c+1] != "B":
-            self.map[r][c] = "B"
-            c += 1
-            self.spread(r, c)
+        # Go down
+        if r < self.max_y-1 and self.map[r+1][c] != "#" and back != "down":
+            self.spread(r + 1, c, "up")
 
-        # Can go down
-        elif r < self.max_y-1 and self.map[r+1][c] != "#" and self.map[r+1][c] != "B":
-            self.map[r][c] = "B"
-            r += 1
-            self.spread(r, c)
+        # Go left
+        if c > 0 and self.map[r][c-1] != "#" and back != "left":
+            self.spread(r, c - 1, "right")
 
-        # Can go left
-        elif c > 0 and self.map[r][c-1] != "#" and self.map[r][c-1] != "B":
-            self.map[r][c] = "B"
-            c -= 1
-            self.spread(r, c)
+        # After checking all directions mark current place as "B"
+        if self.map[r][c] == "P":
+            self.people_eaten += 1
 
-        # Go through sewers
-        elif on_sewer:
-            self.map[r][c] = "B"
-            r, c = self.sewers.pop(0)
-            self.spread(r, c)
-
-        # If the blob can't spread, mark a B and go back
-        else:
-            self.map[r][c] = "B"
-            return
+        self.map[r][c] = "B"
 
     def __str__(self):
         """Returns a well formatted map with the people eaten"""
@@ -81,5 +57,5 @@ class Blob:
         return city
 
     def output(self):
-        self.spread(self.start_x, self.start_y)
+        self.spread(self.start_x, self.start_y, "None")
         return str(self)
