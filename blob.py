@@ -1,4 +1,5 @@
 class Blob:
+    """Class which uses a recursive backtracking function to traverse a map orthogonally"""
 
     def __init__(self, max_x, max_y, start_x, start_y, city_map):
         self.max_x = int(max_x)
@@ -23,7 +24,7 @@ class Blob:
                     self.sewers.append((i, j))
 
     def spread(self, r, c, back):
-        """"""
+        """The recursive function that checks every direction"""
         # Go up
         if r > 0 and self.map[r - 1][c] != "#" and back != "up":
             self.spread(r - 1, c, "down")
@@ -64,5 +65,6 @@ class Blob:
         return city
 
     def output(self):
+        """Begins recursive call and returns a readable output"""
         self.spread(self.start_x, self.start_y, "None")
         return str(self)

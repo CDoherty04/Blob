@@ -12,6 +12,7 @@ def get_map():
     # Have the user enter an input file
     input_file = input("File name: ")
 
+    # Invalid file names will automatically raise an error
     with open(input_file, "r") as file:
         lines = file.readlines()
 
