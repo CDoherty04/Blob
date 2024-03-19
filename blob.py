@@ -40,11 +40,18 @@ class Blob:
         if c > 0 and self.map[r][c-1] != "#" and back != "left":
             self.spread(r, c - 1, "right")
 
-        # After checking all directions mark current place as "B"
+        # Travel through sewer system
+        if self.map[r][c] == "@" and len(self.sewers) != 0:
+            r, c = self.sewers.pop()
+            self.spread(r, c, "sewer")
+
+        # After checking all directions mark current place as "B" unless it's a sewer
         if self.map[r][c] == "P":
             self.people_eaten += 1
+            self.map[r][c] = "B"
 
-        self.map[r][c] = "B"
+        elif self.map[r][c] == "S":
+            self.map[r][c] = "B"
 
     def __str__(self):
         """Returns a well formatted map with the people eaten"""
